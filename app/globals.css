@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Colour is defined once, here, as raw RGB channels so Tailwind can apply
+ * opacity modifiers (bg-surface/60). Dark is the default; `.light` on <html>
+ * swaps the palette without touching a single component.
+ */
+:root {
+  --canvas: 8 11 20;
+  --surface: 15 20 32;
+  --raised: 22 28 42;
+  --hairline: 33 43 61;
+
+  --ink: 234 238 247;
+  --muted: 148 161 184;
+  --faint: 100 112 133;
+
+  --brand: 79 125 255;
+  --brand-soft: 30 45 96;
+
+  --up: 22 201 141;
+  --down: 255 90 110;
+  --warn: 245 175 60;
+}
+
+.light {
+  --canvas: 247 248 251;
+  --surface: 255 255 255;
+  --raised: 243 245 250;
+  --hairline: 223 228 238;
+
+  --ink: 17 24 39;
+  --muted: 90 102 122;
+  --faint: 140 152 170;
+
+  --brand: 43 92 233;
+  --brand-soft: 226 234 255;
+
+  --up: 6 158 106;
+  --down: 220 48 72;
+  --warn: 193 124 12;
+}
+
+@layer base {
+  * {
+    @apply border-hairline;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /**
+   * The single most important rule in a trading UI: numbers must not change
+   * width as they tick, or every column jitters. Applied to anything numeric.
+   */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  ::selection {
+    background: rgb(var(--brand) / 0.32);
+  }
+
+  /* Slim, unobtrusive scrollbars — dense data screens have many of them. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--hairline));
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--faint));
+    background-clip: content-box;
+  }
+
+  /* Visible focus for keyboard users, invisible for mouse users. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-hairline bg-surface shadow-card;
+  }
+
+  .card-pad {
+    @apply p-4 sm:p-5;
+  }
+
+  /* Section label above a group of data. */
+  .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.12em] text-faint;
+  }
+
+  .divider {
+    @apply h-px w-full bg-hairline;
+  }
+
+  /* Sticky table head that survives horizontal scroll on mobile. */
+  .thead {
+    @apply sticky top-0 z-10 bg-surface/95 backdrop-blur;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded bg-raised;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--ink) / 0.06),
+      transparent
+    );
+  }
+
+  /* Horizontal scroll containers must never make the page scroll sideways. */
+  .scroll-x {
+    @apply -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0;
+    scrollbar-width: thin;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
